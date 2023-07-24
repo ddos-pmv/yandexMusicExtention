@@ -187,5 +187,8 @@ function checkForElements() {
 		trackManager.attachListeners();
 	}
 }
+let queueBtn = document.querySelector(
+	".player-controls__btn.deco-player-controls__button.player-controls__btn_seq"
+);
 
 // let trackManager = new MessageManager();
