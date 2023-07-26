@@ -5,11 +5,19 @@
 }
 body {
 	width: 300px;
-	height: 450px;
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-end;
 }
+
+.visuals__container {
+	min-height: 280px;
+	padding: 10px;
+}
+.track__img {
+	height: 280px;
+}
+
 .progress__bar__wrapper {
 	margin-bottom: 3px;
 	background-color: hsla(0, 0%, 74.9%, 0.95);
@@ -40,7 +48,8 @@ body {
 .prev__track__btn,
 .next__track__btn,
 .play__track__btn,
-.queue__btn {
+.queue__btn,
+.statistics {
 	width: 22px;
 	height: 22px;
 	background-size: 100%;
@@ -55,6 +64,9 @@ body {
 .next__track__btn {
 	background-image: url(/popup/icons/track-next.svg);
 }
+.statistics {
+	background-image: url(/popup/icons/assessment_black_24dp.svg);
+}
 
 .queue__btn {
 	background-image: url(/popup/icons/playlist-next.svg);
@@ -62,7 +74,19 @@ body {
 .prev__track__btn:hover,
 .next__track__btn:hover,
 .play__track__btn:hover,
-.queue__btn:hover {
-	opacity: 0.8;
+.queue__btn:hover,
+.statistics:hover {
+	opacity: 0.85;
 	cursor: pointer;
+}
+
+.track__title_container {
+	margin-bottom: 5px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+.track__title {
+	font-weight: 500;
+	font-size: 15px;
 }

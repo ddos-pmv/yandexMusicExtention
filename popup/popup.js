@@ -15,26 +15,58 @@
 // });
 
 // console.log(123);
-let trackName = document.querySelector(".track__title");
-let trackArtists = document.querySelector(".track__artists");
-let playBtn = document.querySelector(".play__track__btn");
-let trackImg = document.querySelector(".track__img");
 
-chrome.runtime.onMessage.addListener(function (message, sender) {
-	if (message.message == "fromBg") {
-		console.log(message.myTab);
+// chrome.runtime.onMessage.addListener((message, sender) => {
+// 	if (message.message == "fromBg") {
+// 		console.log(message.myTab);
+// 	}
+// 	//  else {
+// 	// 	document.querySelector(".progress__bar__line").style.width =
+// 	// 		String(100 + message.message) + "%";
+// 	// }
+// });
+// chrome.runtime.sendMessage({ message: "getFullPage" });
+
+class Popup {
+	constructor() {
+		this.tabReady = false;
+		chrome.runtime.sendMessage({ message: "getFullPage" });
+		this.trackName = document.querySelector(".track__title");
+		this.trackArtists = document.querySelector(".track__artists");
+		this.playBtn = document.querySelector(".play__track__btn");
+		this.trackImg = document.querySelector(".track__img");
+		this.progressBar = document.querySelector(".progress__bar__line");
+	}
+	fullPageSetter(message) {
+		this.trackName.textContent = message.trackName;
+		this.trackArtists.textContent = message.trackArtists;
+		this.playBtn.style.backgroundImage = "url(" + message.playBtnSrc + ")";
+		this.trackImg.src = message.imgSrc.slice(0, -5) + "300x300";
+		this.progressBar.style.width = String(100 + message.progress) + "%";
 	}
 
-	if (message.message == "fullPage") {
-		trackName.textContent = message.trackName;
-		trackArtists.textContent = message.trackArtists;
-		playBtn.style.backgroundImage = "url(" + message.playBtnSrc + ")";
-		console.log(message.playBtnSrc);
-		console.log(message.imgSrc);
+	attachListeners() {
+		chrome.runtime.onMessage.addListener((message, sender) => {
+			switch (message.message) {
+				case "fullPage":
+					console.log(message.message);
+					this.fullPageSetter(message);
+					break;
+
+				case "tabReady":
+					this.tabReady = true;
+
+					break;
+				case "fromBg":
+					console.log(message);
+					break;
+				case "progress":
+					this.progressBar.style.width = String(100 + message.progress) + "%";
+
+					break;
+			}
+		});
 	}
-	//  else {
-	// 	document.querySelector(".progress__bar__line").style.width =
-	// 		String(100 + message.message) + "%";
-	// }
-});
-chrome.runtime.sendMessage({ message: "getFullPage" });
+}
+const popup = new Popup();
+popup.attachListeners();
