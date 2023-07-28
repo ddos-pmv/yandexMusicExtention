@@ -22,7 +22,6 @@ body {
 	margin-bottom: 3px;
 	background-color: hsla(0, 0%, 74.9%, 0.95);
 	height: 10px;
-	width: 100%;
 }
 .progress__bar__line {
 	background-color: #fc0;

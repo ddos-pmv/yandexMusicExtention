@@ -34,6 +34,8 @@ class Popup {
 		this.trackName = document.querySelector(".track__title");
 		this.trackArtists = document.querySelector(".track__artists");
 		this.playBtn = document.querySelector(".play__track__btn");
+		this.prevBtn = document.querySelector(".prev__track__btn");
+		this.nextBtn = document.querySelector(".next__track__btn");
 		this.trackImg = document.querySelector(".track__img");
 		this.progressBar = document.querySelector(".progress__bar__line");
 	}
@@ -42,11 +44,32 @@ class Popup {
 		this.trackArtists.textContent = message.trackArtists;
 		this.playBtn.style.backgroundImage = "url(" + message.playBtnSrc + ")";
 		this.trackImg.src = message.imgSrc.slice(0, -5) + "300x300";
-		this.progressBar.style.width = String(100 + message.progress) + "%";
+		if (message.progress != null)
+			this.progressBar.style.width = String(100 + message.progress) + "%";
+	}
+
+	playBtnClickHandler() {
+		chrome.runtime.sendMessage({ message: "playBtnClicked" });
+	}
+	nextBtnClickHandler() {
+		chrome.runtime.sendMessage({ message: "nextBtnClicked" });
+	}
+	prevBtnClickHandler() {
+		chrome.runtime.sendMessage({ message: "prevBtnClicked" });
+	}
+	trackChange(message) {
+		this.trackName.textContent = message.trackName;
+		this.trackArtists.textContent = message.trackArtists;
+		this.playBtn.style.backgroundImage = "url(" + message.playBtnSrc + ")";
+		this.trackImg.src = message.imgSrc.slice(0, -5) + "300x300";
 	}
 
 	attachListeners() {
+		this.playBtn.addEventListener("click", this.playBtnClickHandler);
+		this.nextBtn.addEventListener("click", this.nextBtnClickHandler);
+		this.prevBtn.addEventListener("click", this.prevBtnClickHandler);
 		chrome.runtime.onMessage.addListener((message, sender) => {
+			console.log(message);
 			switch (message.message) {
 				case "fullPage":
 					console.log(message.message);
@@ -61,9 +84,17 @@ class Popup {
 					console.log(message);
 					break;
 				case "progress":
-					this.progressBar.style.width = String(100 + message.progress) + "%";
+					if (message.progress != null) {
+						this.progressBar.style.width = String(100 + message.progress) + "%";
+					}
 
 					break;
+				case "playBtn":
+					this.playBtn.style.backgroundImage =
+						"url(" + message.playBtnSrc + ")";
+					break;
+				case "trackChange":
+					this.trackChange(message);
 			}
 		});
 	}

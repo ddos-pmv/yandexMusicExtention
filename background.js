@@ -88,8 +88,9 @@ class TabManager {
 	}
 	sender() {
 		setInterval(() => {
-			chrome.runtime.sendMessage({ message: "", myTab: this.myTab.id });
-		}, 1000);
+			chrome.tabs.update(this.myTab.id, {});
+			// chrome.runtime.sendMessage({ message: "", myTab: this.myTab.id });
+		}, 4000);
 	}
 
 	attachListeners() {
@@ -103,9 +104,24 @@ class TabManager {
 			if (this.myTab != null) this.updateHandler(updatedTabId);
 		});
 		chrome.runtime.onMessage.addListener((message, sender) => {
-			if (sender.url == this.popupUrl) {
+			if (message.message == "getFullPage") {
 				console.log("message from popup is being in background now");
 				chrome.tabs.sendMessage(this.myTab.id, { message: "getFullPage" });
+			} else if (message.message == "playBtnClicked") {
+				console.log(
+					"message from popup is being in background now(playBtnClicked)"
+				);
+				chrome.tabs.sendMessage(this.myTab.id, { message: "playBtnClicked" });
+			} else if (message.message == "nextBtnClicked") {
+				console.log(
+					"message from popup is being in background now(nextBtnClicked)"
+				);
+				chrome.tabs.sendMessage(this.myTab.id, { message: "nextBtnClicked" });
+			} else if (message.message == "prevBtnClicked") {
+				console.log(
+					"message from popup is being in background now(prevBtnClicked)"
+				);
+				chrome.tabs.sendMessage(this.myTab.id, { message: "prevBtnClicked" });
 			}
 		});
 	}
