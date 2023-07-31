@@ -19,7 +19,7 @@ body {
 }
 
 .progress__bar__wrapper {
-	margin-bottom: 3px;
+	position: relative;
 	background-color: hsla(0, 0%, 74.9%, 0.95);
 	height: 10px;
 }
@@ -29,6 +29,35 @@ body {
 	left: 0;
 	height: 10px;
 	width: 0;
+}
+.progress__text {
+	z-index: 900;
+	display: none;
+	line-height: 9.5px;
+	width: 100%;
+	font-size: 9.5px;
+	color: rgb(0, 0, 0);
+	height: 10px;
+	position: absolute;
+	top: 0.25px;
+	left: 0;
+}
+.progress__right {
+	pointer-events: none;
+	margin-right: 5px;
+	float: right;
+}
+.progress__left {
+	pointer-events: none;
+	margin-left: 5px;
+	float: left;
+}
+
+.progress__bar__wrapper:hover {
+	cursor: pointer;
+}
+.progress__bar__wrapper:hover .progress__text {
+	display: block;
 }
 .controls__btns {
 	margin: 10px 0;

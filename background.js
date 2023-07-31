@@ -105,23 +105,18 @@ class TabManager {
 		});
 		chrome.runtime.onMessage.addListener((message, sender) => {
 			if (message.message == "getFullPage") {
-				console.log("message from popup is being in background now");
 				chrome.tabs.sendMessage(this.myTab.id, { message: "getFullPage" });
 			} else if (message.message == "playBtnClicked") {
-				console.log(
-					"message from popup is being in background now(playBtnClicked)"
-				);
 				chrome.tabs.sendMessage(this.myTab.id, { message: "playBtnClicked" });
 			} else if (message.message == "nextBtnClicked") {
-				console.log(
-					"message from popup is being in background now(nextBtnClicked)"
-				);
 				chrome.tabs.sendMessage(this.myTab.id, { message: "nextBtnClicked" });
 			} else if (message.message == "prevBtnClicked") {
-				console.log(
-					"message from popup is being in background now(prevBtnClicked)"
-				);
 				chrome.tabs.sendMessage(this.myTab.id, { message: "prevBtnClicked" });
+			} else if (message.message == "progressClicked") {
+				console.log(message);
+				chrome.tabs.sendMessage(this.myTab.id, message);
+			} else if (message.message == "progress") {
+				console.log("progress");
 			}
 		});
 	}

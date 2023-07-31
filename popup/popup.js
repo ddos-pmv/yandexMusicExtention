@@ -38,6 +38,10 @@ class Popup {
 		this.nextBtn = document.querySelector(".next__track__btn");
 		this.trackImg = document.querySelector(".track__img");
 		this.progressBar = document.querySelector(".progress__bar__line");
+		this.progressRight = document.querySelector(".progress__right");
+		this.progressLeft = document.querySelector(".progress__left");
+		this.progressBarWrapper = document.querySelector(".progress__bar__wrapper");
+		console.log(this.progressBarWrapper);
 	}
 	fullPageSetter(message) {
 		this.trackName.textContent = message.trackName;
@@ -63,13 +67,25 @@ class Popup {
 		this.playBtn.style.backgroundImage = "url(" + message.playBtnSrc + ")";
 		this.trackImg.src = message.imgSrc.slice(0, -5) + "300x300";
 	}
+	progressClickHandler(e) {
+		console.log("sended");
+		chrome.runtime.sendMessage({
+			message: "progressClicked",
+			progressNewState: (e.offsetX / this.progressBarWrapper.clientWidth) * 100,
+		});
+	}
 
 	attachListeners() {
 		this.playBtn.addEventListener("click", this.playBtnClickHandler);
 		this.nextBtn.addEventListener("click", this.nextBtnClickHandler);
 		this.prevBtn.addEventListener("click", this.prevBtnClickHandler);
+
+		this.progressBarWrapper.addEventListener(
+			"click",
+			this.progressClickHandler.bind(this)
+		);
+
 		chrome.runtime.onMessage.addListener((message, sender) => {
-			console.log(message);
 			switch (message.message) {
 				case "fullPage":
 					console.log(message.message);
@@ -87,6 +103,8 @@ class Popup {
 					if (message.progress != null) {
 						this.progressBar.style.width = String(100 + message.progress) + "%";
 					}
+					this.progressLeft.textContent = message.progressLeft;
+					this.progressRight.textContent = message.progressRight;
 
 					break;
 				case "playBtn":

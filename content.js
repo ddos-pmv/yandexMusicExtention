@@ -56,9 +56,20 @@ class MyTrackManager {
 			)
 			.click();
 	}
+	// progressClicker(newState) {
+	// 	console.log("clicker working, clicking", newState);
+	// 	document.dispatchEvent(
+	// 		new MouseEvent("click", {
+	// 			bubbles: true,
+	// 			composed: true,
+	// 			clientX: 100,
+	// 			clientY: 864,
+	// 		})
+	// 	);
+	// 	console.log("clicked");
+	// }
 	attachListeners() {
 		chrome.runtime.onMessage.addListener((message, sender) => {
-			console.log(message.message);
 			//проверка сообщения и отправка ответа
 			switch (message.message) {
 				case "getFullPage":
@@ -81,6 +92,11 @@ class MyTrackManager {
 				case "prevBtnClicked":
 					this.prevBtnClicker();
 					break;
+				case "progressClicked":
+					this.progressClicker(message.progressNewState);
+					break;
+				default:
+					console.log("some message in content");
 			}
 		});
 	}
@@ -97,16 +113,6 @@ class MyTrackManager {
 		);
 		this.progress = parseFloat(
 			(-100 + (this.trackPlayedTime / this.trackDuration) * 100).toFixed(4)
-		);
-		console.log(
-			this.progress,
-			this.trackDuration,
-			this.trackPlayedTime,
-			parseFloat(
-				document
-					.querySelector(".progress__line__branding")
-					.style.transform.slice(11, -2)
-			)
 		);
 	}
 
@@ -178,10 +184,15 @@ let barObserver = new MutationObserver((mutationList) => {
 						.querySelector(".progress__line__branding")
 						.style.transform.slice(11, -2)
 				);
+				let progressRight =
+					document.querySelector(".progress__right").innerText;
+				let progressLeft = document.querySelector(".progress__left").innerText;
 
 				chrome.runtime.sendMessage({
 					message: "progress",
 					progress: localProgress,
+					progressRight: progressRight,
+					progressLeft: progressLeft,
 				});
 			} else if (
 				mutation.target.classList.contains("player-controls__btn_play")
@@ -227,4 +238,8 @@ barObserver.observe(document.querySelector(".bar__content"), {
 	childList: true,
 	subtree: true,
 	attributes: true,
+});
+
+document.addEventListener("click", (e) => {
+	console.log(e.target, e.clientX, e.clientY);
 });
