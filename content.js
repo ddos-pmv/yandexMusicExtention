@@ -56,18 +56,43 @@ class MyTrackManager {
 			)
 			.click();
 	}
-	// progressClicker(newState) {
-	// 	console.log("clicker working, clicking", newState);
-	// 	document.dispatchEvent(
-	// 		new MouseEvent("click", {
-	// 			bubbles: true,
-	// 			composed: true,
-	// 			clientX: 100,
-	// 			clientY: 864,
-	// 		})
-	// 	);
-	// 	console.log("clicked");
-	// }
+	progressClicker(newState) {
+		let progressLine = document.querySelector(
+			".player-progress.progress.deco-progress.progress_branding"
+		);
+		let tapX = parseInt(
+			(progressLine.clientWidth / 100) * newState +
+				(document.body.clientWidth - progressLine.clientWidth) / 2
+		);
+		let tapY = 865;
+		console.log(
+			progressLine.clientWidth,
+			newState,
+			tapX,
+			(progressLine.clientWidth / 100) * newState
+		);
+		let event = new MouseEvent("mousedown", {
+			composed: true,
+			bubbles: true,
+			cancelable: true,
+			clientX: tapX,
+		});
+		let moveEvent = new MouseEvent("mousemove", {
+			composed: true,
+			bubbles: true,
+			cancelable: true,
+			clientX: tapX,
+		});
+		let upEvent = new MouseEvent("mouseup", {
+			composed: true,
+			bubbles: true,
+			cancelable: true,
+			clientX: tapX,
+		});
+		progressLine.dispatchEvent(event);
+		progressLine.dispatchEvent(moveEvent);
+		progressLine.dispatchEvent(upEvent);
+	}
 	attachListeners() {
 		chrome.runtime.onMessage.addListener((message, sender) => {
 			//проверка сообщения и отправка ответа
@@ -207,30 +232,32 @@ let barObserver = new MutationObserver((mutationList) => {
 					playBtnSrc: localPlayBtn,
 				});
 			}
-		}
-
-		if (
-			mutation.target.classList.contains("player-controls__track-container") &&
-			mutation.type === "childList" &&
-			mutation.addedNodes.length > 0
-		) {
-			let localPlayBtn;
-			if (document.querySelector(".player-controls__btn_pause") != null)
-				localPlayBtn = "icons/pause.svg";
-			else localPlayBtn = "icons/play.svg";
-			let localTrackName = document.querySelector(".track__title").textContent;
-			let localTrackArtists =
-				document.querySelector(".track__artists").textContent;
-			let localImgSrc = document.querySelector(
-				".player-controls__track .entity-cover__image.deco-pane"
-			).src;
-			chrome.runtime.sendMessage({
-				message: "trackChange",
-				playBtnSrc: localPlayBtn,
-				trackName: localTrackName,
-				trackArtists: localTrackArtists,
-				imgSrc: localImgSrc,
-			});
+		} else if (mutation.type === "childList") {
+			if (
+				mutation.target.classList.contains(
+					"player-controls__track-container"
+				) &&
+				mutation.addedNodes.length > 0
+			) {
+				let localPlayBtn;
+				if (document.querySelector(".player-controls__btn_pause") != null)
+					localPlayBtn = "icons/pause.svg";
+				else localPlayBtn = "icons/play.svg";
+				let localTrackName =
+					document.querySelector(".track__title").textContent;
+				let localTrackArtists =
+					document.querySelector(".track__artists").textContent;
+				let localImgSrc = document.querySelector(
+					".player-controls__track .entity-cover__image.deco-pane"
+				).src;
+				chrome.runtime.sendMessage({
+					message: "trackChange",
+					playBtnSrc: localPlayBtn,
+					trackName: localTrackName,
+					trackArtists: localTrackArtists,
+					imgSrc: localImgSrc,
+				});
+			}
 		}
 	}
 });
