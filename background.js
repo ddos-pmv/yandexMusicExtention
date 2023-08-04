@@ -81,17 +81,24 @@ class TabManager {
 			this.myTab = null;
 		}
 	}
-	updateHandler(updatedTabId) {
-		if (updatedTabId == this.myTab.id) {
-			console.log("injecting");
+	updateHandler(updatedTabId, changeInfo, tab) {
+		if (
+			updatedTabId == this.myTab.id &&
+			changeInfo.audible == undefined &&
+			changeInfo.title == undefined &&
+			changeInfo.favIconUrl == undefined
+		) {
+			console.log(updatedTabId, changeInfo, tab);
 			this._executeContentScript();
 		}
 	}
 	sender() {
-		setInterval(() => {
-			chrome.tabs.update(this.myTab.id, {});
-			// chrome.runtime.sendMessage({ message: "", myTab: this.myTab.id });
-		}, 4000);
+		if (this.myTab != null) {
+			setInterval(() => {
+				chrome.tabs.update(this.myTab.id, {});
+				// chrome.runtime.sendMessage({ message: "", myTab: this.myTab.id });
+			}, 4000);
+		}
 	}
 
 	attachListeners() {
@@ -101,8 +108,8 @@ class TabManager {
 		chrome.tabs.onRemoved.addListener((removedTabId) => {
 			if (this.myTab != null) this.removeHandler(removedTabId);
 		});
-		chrome.tabs.onUpdated.addListener((updatedTabId) => {
-			if (this.myTab != null) this.updateHandler(updatedTabId);
+		chrome.tabs.onUpdated.addListener((updatedTabId, changeInfo, tab) => {
+			if (this.myTab != null) this.updateHandler(updatedTabId, changeInfo, tab);
 		});
 		chrome.runtime.onMessage.addListener((message, sender) => {
 			switch (message.message) {
@@ -122,7 +129,6 @@ class TabManager {
 					chrome.tabs.sendMessage(this.myTab.id, message);
 					break;
 				case "progress":
-					console.log("progress");
 					break;
 				default:
 					console.log("some message in background now", message);
