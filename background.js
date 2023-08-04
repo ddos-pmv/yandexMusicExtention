@@ -83,6 +83,7 @@ class TabManager {
 	}
 	updateHandler(updatedTabId) {
 		if (updatedTabId == this.myTab.id) {
+			console.log("injecting");
 			this._executeContentScript();
 		}
 	}
@@ -104,19 +105,27 @@ class TabManager {
 			if (this.myTab != null) this.updateHandler(updatedTabId);
 		});
 		chrome.runtime.onMessage.addListener((message, sender) => {
-			if (message.message == "getFullPage") {
-				chrome.tabs.sendMessage(this.myTab.id, { message: "getFullPage" });
-			} else if (message.message == "playBtnClicked") {
-				chrome.tabs.sendMessage(this.myTab.id, { message: "playBtnClicked" });
-			} else if (message.message == "nextBtnClicked") {
-				chrome.tabs.sendMessage(this.myTab.id, { message: "nextBtnClicked" });
-			} else if (message.message == "prevBtnClicked") {
-				chrome.tabs.sendMessage(this.myTab.id, { message: "prevBtnClicked" });
-			} else if (message.message == "progressClicked") {
-				console.log(message);
-				chrome.tabs.sendMessage(this.myTab.id, message);
-			} else if (message.message == "progress") {
-				console.log("progress");
+			switch (message.message) {
+				case "getFullPage":
+					chrome.tabs.sendMessage(this.myTab.id, { message: "getFullPage" });
+					break;
+				case "playBtnClicked":
+					chrome.tabs.sendMessage(this.myTab.id, { message: "playBtnClicked" });
+					break;
+				case "nextBtnClicked":
+					chrome.tabs.sendMessage(this.myTab.id, { message: "nextBtnClicked" });
+					break;
+				case "prevBtnClicked":
+					chrome.tabs.sendMessage(this.myTab.id, { message: "prevBtnClicked" });
+					break;
+				case "progressClicked":
+					chrome.tabs.sendMessage(this.myTab.id, message);
+					break;
+				case "progress":
+					console.log("progress");
+					break;
+				default:
+					console.log("some message in background now", message);
 			}
 		});
 	}
