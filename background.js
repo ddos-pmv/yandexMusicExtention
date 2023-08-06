@@ -76,7 +76,6 @@ class TabManager {
 
 	removeHandler(removedTabId) {
 		if (removedTabId == this.myTab.id) {
-			console.log("removed my tab");
 			chrome.action.setPopup({ popup: "" });
 			this.myTab = null;
 		}
@@ -88,7 +87,6 @@ class TabManager {
 			changeInfo.title == undefined &&
 			changeInfo.favIconUrl == undefined
 		) {
-			console.log(updatedTabId, changeInfo, tab);
 			this._executeContentScript();
 		}
 	}
@@ -127,6 +125,11 @@ class TabManager {
 					break;
 				case "progressClicked":
 					chrome.tabs.sendMessage(this.myTab.id, message);
+					break;
+				case "statisticsBtnClicked":
+					chrome.tabs.sendMessage(this.myTab.id, {
+						message: "statisticsBtnClicked",
+					});
 					break;
 				case "progress":
 					break;

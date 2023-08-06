@@ -94,6 +94,7 @@ body {
 }
 .statistics {
 	background-image: url(/popup/icons/assessment_black_24dp.svg);
+	pointer-events: none;
 }
 
 .queue__btn {

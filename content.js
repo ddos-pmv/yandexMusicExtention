@@ -1,8 +1,4 @@
 "use strict";
-console.log(
-	"sdfasfasdfasdfasdfasdfsdfsdfasdfasdfasdfafasdfasdfasdfasdfasdfasdfassdfasdfasdfasdfasdfasfasdasdfasdasdfasdfasdfasdfasdfasdf"
-);
-
 class TrackManager {
 	constructor() {
 		this.trackName = null;
@@ -18,6 +14,7 @@ class TrackManager {
 			imgSrc: this.imgSrc,
 			playBtnSrc: this.playBtnSrc,
 		});
+		this.queueBtn = null;
 	}
 
 	//getting progress in percents
@@ -105,6 +102,10 @@ class TrackManager {
 		//needs timeout for ym to load class, that's why event "click" didn't work
 		progressLine.dispatchEvent(click[2]);
 	}
+
+	statisticsBtnClicker() {
+		// getHistory();
+	}
 	attachListeners() {
 		chrome.runtime.onMessage.addListener((message, sender) => {
 			//проверка сообщения и отправка ответа
@@ -132,6 +133,9 @@ class TrackManager {
 				case "progressClicked":
 					this.progressClicker(message.progressNewState);
 					break;
+				case "statisticsBtnClicked":
+					this.statisticsBtnClicker();
+					break;
 				default:
 					console.log("some message in content", message);
 			}
@@ -147,10 +151,6 @@ class TrackManager {
 }
 //
 //
-//
-//
-//
-//
 
 class TrackObserver extends TrackManager {
 	constructor() {
@@ -161,7 +161,9 @@ class TrackObserver extends TrackManager {
 		this.progressLeft = null;
 
 		//start observing
-		this.barObserver = new MutationObserver(this.mutationsHandler.bind(this));
+		this.barObserver = new MutationObserver(
+			this.barMutationsHandler.bind(this)
+		);
 
 		this.barObserver.observe(document.querySelector(".bar__content"), {
 			childList: true,
@@ -170,7 +172,7 @@ class TrackObserver extends TrackManager {
 		});
 	}
 
-	mutationsHandler(mutationList) {
+	barMutationsHandler(mutationList) {
 		for (let mutation of mutationList) {
 			if (mutation.type === "attributes") {
 				this.attributesMutationHandler(mutation);
@@ -235,19 +237,82 @@ class TrackObserver extends TrackManager {
 		}
 	}
 }
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+/*
+
+
+HISTORY GETTER
+
+
+*/
+async function getHistory() {
+	var div = document.createElement("div");
+
+	div.style.width = "800px";
+	div.style.height = "50px";
+	div.style.position = "fixed";
+	div.style.bottom = "10px";
+	div.style.right = "10px";
+	div.style.backgroundColor = "gray";
+	div.style.color = "white";
+	div.style.textAlign = "right";
+	div.style.padding = "5px";
+
+	// Добавляем div на страницу
+	document.body.appendChild(div);
+
+	console.log("observer let");
+
+	let observer = new MutationObserver(() => {
+		console.log("mutation");
+		if (document.querySelector(".popup-sequence__history-tab") != null) {
+			if (
+				document.querySelector(".current.popup-sequence__history-tab") == null
+			) {
+				document.querySelector(".popup-sequence__history-tab").click();
+			}
+			if (
+				document.querySelector(".current.popup-sequence__history-tab") !=
+					null &&
+				document.querySelectorAll(
+					".d-track typo-track.d-track_with-cover.d-track_in-lib.d-track_playing"
+				).length > 0
+			) {
+				console.log("1");
+				observer.disconnect();
+			}
+		}
+	});
+
+	console.log("observer observe");
+	observer.observe(document.querySelector(".popup-holder"), {
+		childList: true,
+		subtree: true,
+	});
+	console.log("observer is observing");
+
+	let queueBtn = document.querySelector(".d-icon.d-icon_playlist-next");
+	let popupHolder = document.querySelector(".popup-holder.sequence");
+
+	console.log("clicking");
+	queueBtn.click();
+}
+
+/*
+
+
+
+
+
+
+STRARTING CLASS WORK
+
+
+
+
+
+
+
+*/
 let trackManager;
 if (
 	document.querySelectorAll(".track__title").length > 0 &&
@@ -276,72 +341,3 @@ if (
 		}
 	}
 }
-
-// let barObserver = new MutationObserver((mutationList) => {
-// 	for (let mutation of mutationList) {
-// 		if (mutation.type === "attributes") {
-// 			// Проверяем, что элемент имеет класс "progress"
-// 			if (mutation.target.classList.contains("progress__line__branding")) {
-// 				let localProgress = parseFloat(
-// 					document
-// 						.querySelector(".progress__line__branding")
-// 						.style.transform.slice(11, -2)
-// 				);
-// 				let progressRight =
-// 					document.querySelector(".progress__right").textContent;
-// 				let progressLeft =
-// 					document.querySelector(".progress__left").textContent;
-
-// 				chrome.runtime.sendMessage({
-// 					message: "progress",
-// 					progress: localProgress,
-// 					progressRight: progressRight,
-// 					progressLeft: progressLeft,
-// 				});
-// 			} else if (
-// 				mutation.target.classList.contains("player-controls__btn_play")
-// 			) {
-// 				let localPlayBtn;
-// 				if (document.querySelector(".player-controls__btn_pause") != null)
-// 					localPlayBtn = "icons/pause.svg";
-// 				else localPlayBtn = "icons/play.svg";
-
-// 				chrome.runtime.sendMessage({
-// 					message: "playBtn",
-// 					playBtnSrc: localPlayBtn,
-// 				});
-// 			}
-// 		} else if (mutation.type === "childList") {
-// 			if (
-// 				mutation.target.classList.contains(
-// 					"player-controls__track-container"
-// 				) &&
-// 				mutation.addedNodes.length > 0
-// 			) {
-// 				let localPlayBtn;
-// 				if (document.querySelector(".player-controls__btn_pause") != null)
-// 					localPlayBtn = "icons/pause.svg";
-// 				else localPlayBtn = "icons/play.svg";
-// 				let localTrackName =
-// 					document.querySelector(".track__title").textContent;
-// 				let localTrackArtists =
-// 					document.querySelector(".track__artists").textContent;
-// 				let localImgSrc = document.querySelector(
-// 					".player-controls__track .entity-cover__image.deco-pane"
-// 				).src;
-// 				chrome.runtime.sendMessage({
-// 					message: "trackChange",
-// 					playBtnSrc: localPlayBtn,
-// 					trackName: localTrackName,
-// 					trackArtists: localTrackArtists,
-// 					imgSrc: localImgSrc,
-// 				});
-// 			}
-// 		}
-// 	}
-// });
-// barObserver.observe(document.querySelector(".bar__content"), {
-// 	childList: true,
-// 	subtree: true,
-// 	attributes: true,
-// });
