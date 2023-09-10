@@ -5,19 +5,83 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Document</title>
 		<link rel="stylesheet" href="styles.css" />
+		<link rel="stylesheet" href="styles2.css" />
 	</head>
 	<body>
-		<div class="visuals__container">
-			<img src="" class="track__img" alt="" />
+		<div class="app1">
+			<div class="app1__injected__content">
+				<div class="nav">
+					<div class="nav__title">
+						<span class="yandex__music">ЯндексМузыка</span>
+						<span class="statistics">Statistics</span>
+					</div>
+				</div>
+				<div class="stat">
+					<div class="stat__upper">
+						<div class="stat__title">Stat for 04.25.23 (4000 tracks)</div>
+						<div class="stat__more">More</div>
+					</div>
+					<div class="stat__preview">
+						<div
+							class="stat__track"
+							style="
+								background-image: url(https://avatars.yandex.net/get-music-content/2373979/d0a9b10b.a.9663941-1/100x100);
+							"
+						>
+							<div class="stat__track__rate">#1</div>
+							<div class="stat__track__name">6VERYLongword</div>
+						</div>
+						<div
+							class="stat__track"
+							style="
+								background-image: url(https://avatars.yandex.net/get-music-content/2427101/fd4aa380.a.10910819-1/100x100);
+							"
+						>
+							<div class="stat__track__rate">#2</div>
+							<div class="stat__track__name">crybaby</div>
+						</div>
+						<div
+							class="stat__track"
+							style="
+								background-image: url(https://avatars.yandex.net/get-music-content/2427101/fd4aa380.a.10910819-1/100x100);
+							"
+						>
+							<div class="stat__track__rate">#2</div>
+							<div class="stat__track__name">crybaby</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="trackBar">
+				<div class="app1__progress__wrapper">
+					<div class="app1__progress"></div>
+				</div>
+
+				<div class="app1__controls">
+					<div class="app1__like__btn"></div>
+					<div class="app1__title__container">
+						<div class="app1__track__title">Loading...</div>
+						<div class="app1__track__artists">loading...</div>
+					</div>
+					<div class="app1__play__btn"></div>
+				</div>
+			</div>
 		</div>
-		<div class="visual__container2"></div>
-		<div class="track__title_container">
-			<div class="track__title">Undefined</div>
-			<div class="track__artists">Undefined</div>
-		</div>
-		<div class="controls__container">
-			<div class="progress__bar__wrapper">
-				<div class="progress__bar__line"></div>
+		<div class="app2">
+			<div class="expand"></div>
+			<div class="visuals__container">
+				<img src="" class="track__img" alt="Loading..." />
+			</div>
+			<div class="track__title__container">
+				<div class="track__title">Loading...</div>
+				<div class="track__artists">Loading...</div>
+			</div>
+			<div class="progress__container">
+				<div class="progress__bar__wrapper">
+					<div class="progress__bar__line" style="position: relative">
+						<!-- <div class="progress__circle"></div> -->
+					</div>
+				</div>
 				<div class="progress__text">
 					<div class="progress__left">0:00</div>
 					<div class="progress__right">0:00</div>
@@ -25,14 +89,35 @@
 			</div>
 			<div class="controls__btns">
 				<div class="switch__btns">
-					<div class="prev__track__btn"></div>
-					<div class="play__track__btn"></div>
-					<div class="next__track__btn"></div>
-					<div class="queue__btn"></div>
+					<div class="block__track__btn"></div>
+					<div class="prev__play__next">
+						<div class="prev__track__btn"></div>
+						<div class="play__track__btn"></div>
+						<div class="next__track__btn"></div>
+					</div>
+					<div class="like__track__btn"></div>
 				</div>
-				<div class="secondary__coontrols__btns">
-					<div class="statistics"></div>
+				<div class="secondary__controls__btns">
+					<div class="shuffle__track__btn"></div>
+					<div class="repeat__track__btn"></div>
 				</div>
+			</div>
+		</div>
+		<div class="app3">
+			<div class="app3__cross"></div>
+			<div class="app3__nav">
+				<div class="app3__nav__tracks active">Tracks</div>
+				<div class="app3__nav__artists"></div>
+			</div>
+			<div class="app3__injected__content">
+				<!-- <div class="app3__track">
+					<div class="app3__rate">1</div>
+					<img class="app3__track__img" src="50x50jpg"></img>
+					<div class="app3__track__title">
+						<div class="app3__track__name">6 Kiss</div>
+						<div class="app3__track__stats">123 times, 407 minutes, 46 hours</div>
+					</div>
+				</div> -->
 			</div>
 		</div>
 		<script src="popup.js"></script>

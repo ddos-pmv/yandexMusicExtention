@@ -1,0 +1,64 @@
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+body {
+	padding: 10px;
+}
+.content__area {
+	margin-top: 50px;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-gap: 50px;
+	justify-content: center;
+	align-content: start;
+}
+
+.bugs__info__area {
+	padding-left: 20px;
+	width: 50%;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+}
+.plans__info__area {
+	width: 50%;
+}
+.gmail {
+	font-size: 20px;
+}
+.da {
+	margin-left: 20px;
+}
+.title__text {
+	font-size: 38px;
+	width: 100%;
+	text-align: center;
+}
+.text__content {
+	max-width: 550px;
+}
+.text__text {
+	margin-top: 5px;
+}
+.form__area {
+	grid-row-start: 2;
+	grid-row-end: 4;
+	justify-self: end;
+}
+.support__container {
+	font-size: 20px;
+}
+.important__info {
+	max-width: 1100px;
+	padding: 10px;
+	border-radius: 10px;
+	background-color: #ffc1075e;
+	justify-self: center;
+	font-size: 20px;
+	grid-column-start: 1;
+	grid-column-end: 3;
+	grid-row-start: 1;
+	grid-row-end: 2;
+}

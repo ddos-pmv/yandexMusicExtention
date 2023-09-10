@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<div class="analyze__wrapper">
+			<div class="nav__title">
+				<span class="yandex__music">ЯндексМузыка</span>
+				<span class="statistics">Statistics</span>
+			</div>
+			<div class="sets__wrapper">
+				<div class="tracks">Tracks</div>
+				<!-- <div class="tracks__range">
+					<div class="range__selector">
+						<div class="circle"></div>
+					</div>
+				</div> -->
+				<div class="range">
+					<div class="slider"></div>
+					<div class="thumb">
+						<div class="thumb__inner"></div>
+					</div>
+				</div>
+				<div class="track__col">250</div>
+			</div>
+			<button class="analyze__btn" onclick="myLog('hello')">Start</button>
+		</div>
+		<script>
+			const range = document.querySelector(".range");
+			const slider = range.querySelector(".slider");
+			const thumb = range.querySelector(".thumb");
+
+			thumb.addEventListener("mousedown", (event) => {
+				event.preventDefault();
+				const startX = event.clientX - thumb.getBoundingClientRect().left;
+
+				function moveThumb(event) {
+					const newX =
+						event.clientX - range.getBoundingClientRect().left - startX;
+					const min = 0;
+					const max = range.clientWidth - thumb.clientWidth / 2;
+
+					if (newX >= min && newX <= max) {
+						console.log((newX / max) * 100);
+						thumb.style.left = newX + "px";
+						slider.style.width = newX + "px";
+					}
+				}
+
+				function stopMove() {
+					document.removeEventListener("mousemove", moveThumb);
+					document.removeEventListener("mouseup", stopMove);
+				}
+
+				document.addEventListener("mousemove", moveThumb);
+				document.addEventListener("mouseup", stopMove);
+			});
+			function myLog(log) {
+				console.log(log);
+			}
+		</script>
+	</body>
+</html>

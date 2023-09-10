@@ -52,6 +52,7 @@ class TabManager {
 	}
 
 	async _updateMyTab() {
+		console.log("updatingTab");
 		let tabs = await chrome.tabs.query({
 			url: this.targetUrl,
 			pinned: true,
@@ -76,24 +77,55 @@ class TabManager {
 
 	removeHandler(removedTabId) {
 		if (removedTabId == this.myTab.id) {
-			chrome.action.setPopup({ popup: "" });
-			this.myTab = null;
+			this.restart();
 		}
 	}
 	updateHandler(updatedTabId, changeInfo, tab) {
-		if (
-			updatedTabId == this.myTab.id &&
-			changeInfo.audible == undefined &&
-			changeInfo.title == undefined &&
-			changeInfo.favIconUrl == undefined
-		) {
-			this._executeContentScript();
+		if (updatedTabId == this.myTab.id) {
+			if (changeInfo.url != undefined) {
+				if (changeInfo.url.startsWith("https://music.yandex")) {
+					console.log("nothing to do");
+				} else {
+					console.log("restarting", changeInfo);
+					this.restart();
+				}
+			} else if (
+				updatedTabId == this.myTab.id &&
+				changeInfo.audible == undefined &&
+				changeInfo.title == undefined &&
+				changeInfo.favIconUrl == undefined &&
+				changeInfo.autoDiscardable == undefined &&
+				changeInfo.status == "loading"
+			) {
+				this._executeContentScript();
+			}
 		}
+	}
+
+	restart() {
+		console.log("restarted");
+		chrome.action.setPopup({ popup: "" });
+		this.myTab = null;
 	}
 	sender() {
 		if (this.myTab != null) {
-			setInterval(() => {
-				chrome.tabs.update(this.myTab.id, {});
+			const myInterval = setInterval(() => {
+				if (this.myTab != null) {
+					// if (
+					// 	this.myTab.pendingUrl.startsWith("https://music.yandex") &&
+					// 	(this.myTab.url == "" ||
+					// 		this.myTab.url.startsWith("http://music.yandex"))
+					// ) {
+					console.log("sender");
+					chrome.tabs.update(this.myTab.id, {});
+					// } else {
+					// 	this.restart();
+					// }
+				} else {
+					console.log("restart from sender");
+					this.restart();
+					clearInterval(myInterval);
+				}
 				// chrome.runtime.sendMessage({ message: "", myTab: this.myTab.id });
 			}, 4000);
 		}
@@ -110,8 +142,13 @@ class TabManager {
 			if (this.myTab != null) this.updateHandler(updatedTabId, changeInfo, tab);
 		});
 		chrome.runtime.onMessage.addListener((message, sender) => {
+			if (!this.myTab) {
+				console.log("resstarting");
+				this.restart();
+			}
 			switch (message.message) {
 				case "getFullPage":
+					console.log("get ful Page in bg now");
 					chrome.tabs.sendMessage(this.myTab.id, { message: "getFullPage" });
 					break;
 				case "playBtnClicked":
@@ -131,16 +168,42 @@ class TabManager {
 						message: "statisticsBtnClicked",
 					});
 					break;
+				case "likeBtnClicked":
+					chrome.tabs.sendMessage(this.myTab.id, {
+						message: "likeBtnClicked",
+					});
+					break;
 				case "progress":
 					break;
+				case "repeatBtnClicked":
+					chrome.tabs.sendMessage(this.myTab.id, {
+						message: "repeatBtnClicked",
+					});
+					break;
+				case "shuffleBtnClicked":
+					chrome.tabs.sendMessage(this.myTab.id, {
+						message: "shuffleBtnClicked",
+					});
+					break;
+				case "closeStatTab":
+					chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+						if (tabs.length > 0) {
+							const activeTabId = tabs[0].id;
+							chrome.tabs.remove(activeTabId, () => {
+								console.log("Closed active tab");
+							});
+						}
+					});
+					break;
+
 				default:
-					console.log("some message in background now", message);
+					message = "";
+					break;
 			}
 		});
 	}
 }
 const targetUrl = "https://music.yandex.ru/*";
-const popupUrl =
-	"chrome-extension://oheahanbejjcfjnempoejfankcopkepk/popup/popup.html";
+const popupUrl = chrome.runtime.getURL("popup/popup.html");
 const tabManager = new TabManager(targetUrl, popupUrl);
 tabManager.attachListeners();

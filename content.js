@@ -5,7 +5,13 @@ class TrackManager {
 		this.trackArtists = null;
 		this.imgSrc = null;
 		this.playBtnSrc = null;
-		this.progress = null; //progress in percents
+		this.progress = null;
+		this.progressLeft = null;
+		this.progressRight = null; //progress in percents
+		this.queueBtn = null;
+		this.likeBtn = null;
+		this.shuffleBtn = null;
+		this.repeatBtn = null;
 		this.setFullPage();
 		this.sendMessageToPopup({
 			message: "fullPage",
@@ -13,8 +19,10 @@ class TrackManager {
 			trackName: this.trackName,
 			imgSrc: this.imgSrc,
 			playBtnSrc: this.playBtnSrc,
+			likeBtn: this.likeBtn,
+			shuffleBtn: this.shuffleBtn,
+			repeatBtn: this.repeatBtn,
 		});
-		this.queueBtn = null;
 	}
 
 	//getting progress in percents
@@ -32,12 +40,55 @@ class TrackManager {
 		this.progress = parseFloat(
 			(-100 + (this.trackPlayedTime / this.trackDuration) * 100).toFixed(4)
 		);
+		this.progressRight = document.querySelector(".progress__right").textContent;
+		this.progressLeft = document.querySelector(".progress__left").textContent;
 	}
 
 	getPlayBtn() {
 		if (document.querySelector(".player-controls__btn_pause") != null)
 			this.playBtnSrc = "icons/pause.svg";
 		else this.playBtnSrc = "icons/play.svg";
+	}
+	getLikeBtn() {
+		if (document.querySelector(".d-icon_heart-full") != null) {
+			this.likeBtn = "full";
+		} else {
+			this.likeBtn = "empty";
+		}
+	}
+	getShuffleBtn() {
+		console.log(
+			"shuffle Display",
+			document.querySelector(".player-controls__btn_shuffle").style.display
+		);
+		if (
+			document.querySelector(".d-icon_shuffle-gold") != null &&
+			document.querySelector(".player-controls_radio") == null
+		) {
+			this.shuffleBtn = "shuffleGold";
+		} else {
+			this.shuffleBtn = "noShuffle";
+		}
+	}
+	getRepeatBtn() {
+		if (
+			document.querySelector(".d-icon_repeat") != null ||
+			document.querySelector(".player-controls_radio") != null
+		) {
+			this.repeatBtn = "repeat";
+		}
+		if (
+			document.querySelector(".d-icon_repeat-gold") != null &&
+			document.querySelector(".player-controls_radio") == null
+		) {
+			this.repeatBtn = "repeatGold";
+		}
+		if (
+			document.querySelector(".d-icon_repeat-one-gold") != null &&
+			document.querySelector(".player-controls_radio") == null
+		) {
+			this.repeatBtn = "repeatOneGold";
+		}
 	}
 
 	setFullPage() {
@@ -51,6 +102,9 @@ class TrackManager {
 		).style.backgroundImage;
 		this.getPlayBtn();
 		this.getProgress();
+		this.getLikeBtn();
+		this.getRepeatBtn();
+		this.getShuffleBtn();
 	}
 
 	playBtnClicker() {
@@ -73,6 +127,10 @@ class TrackManager {
 				".player-controls__btn.deco-player-controls__button.player-controls__btn_next"
 			)
 			.click();
+	}
+
+	likeBtnClicker() {
+		document.querySelector(".d-like_theme-player .d-icon").click();
 	}
 	createClickEvents(tapX) {
 		let eventDown = new MouseEvent("mousedown", {
@@ -118,7 +176,12 @@ class TrackManager {
 						trackName: this.trackName,
 						imgSrc: this.imgSrc,
 						playBtnSrc: this.playBtnSrc,
+						likeBtn: this.likeBtn,
 						progress: this.progress,
+						progressLeft: this.progressLeft,
+						progressRight: this.progressRight,
+						shuffleBtn: this.shuffleBtn,
+						repeatBtn: this.repeatBtn,
 					});
 					break;
 				case "playBtnClicked":
@@ -136,6 +199,16 @@ class TrackManager {
 				case "statisticsBtnClicked":
 					this.statisticsBtnClicker();
 					break;
+				case "likeBtnClicked":
+					this.likeBtnClicker();
+					break;
+				case "shuffleBtnClicked":
+					console.log("clicked");
+					document.querySelector(".player-controls__btn_shuffle").click();
+					break;
+				case "repeatBtnClicked":
+					document.querySelector(".player-controls__btn_repeat").click();
+					break;
 				default:
 					console.log("some message in content", message);
 			}
@@ -145,8 +218,9 @@ class TrackManager {
 	sendMessageToPopup(parameters) {
 		// проверка открыт ли попап
 		// Получаем список открытых окон (вкладок и попапов) вашего расширения
-
-		chrome.runtime.sendMessage(parameters);
+		if (chrome && chrome.runtime && chrome.runtime.id) {
+			chrome.runtime.sendMessage(parameters);
+		}
 	}
 }
 //
@@ -209,6 +283,20 @@ class TrackObserver extends TrackManager {
 				playBtnSrc: this.localPlayBtn,
 			});
 		}
+		if (mutation.target.classList.contains("player-controls__btn_repeat")) {
+			this.getRepeatBtn();
+			this.sendMessageToPopup({
+				message: "repeatBtn",
+				repeatBtn: this.repeatBtn,
+			});
+		}
+		if (mutation.target.classList.contains("player-controls__btn_shuffle")) {
+			this.getShuffleBtn();
+			this.sendMessageToPopup({
+				message: "shuffleBtn",
+				shuffleBtn: this.shuffleBtn,
+			});
+		}
 	}
 
 	childListMutationHandler(mutation) {
@@ -216,24 +304,50 @@ class TrackObserver extends TrackManager {
 			mutation.target.classList.contains("player-controls__track-container") &&
 			mutation.addedNodes.length > 0
 		) {
-			const localPlayBtn = document.querySelector(".player-controls__btn_pause")
-				? "icons/pause.svg"
-				: "icons/play.svg";
-			const localTrackName =
-				document.querySelector(".track__title").textContent;
-			const localTrackArtists =
-				document.querySelector(".track__artists").textContent;
-			const localImgSrc = document.querySelector(
-				".player-controls__track .entity-cover__image.deco-pane"
-			).src;
-
+			this.setFullPage();
 			this.sendMessageToPopup({
-				message: "trackChange",
-				playBtnSrc: localPlayBtn,
-				trackName: localTrackName,
-				trackArtists: localTrackArtists,
-				imgSrc: localImgSrc,
+				message: "fullPage",
+				trackArtists: this.trackArtists,
+				trackName: this.trackName,
+				imgSrc: this.imgSrc,
+				playBtnSrc: this.playBtnSrc,
+				likeBtn: this.likeBtn,
+				shuffleBtn: this.shuffleBtn,
+				repeatBtn: this.repeatBtn,
 			});
+
+			// const localPlayBtn = document.querySelector(".player-controls__btn_pause")
+			// 	? "icons/pause.svg"
+			// 	: "icons/play.svg";
+			// const localTrackName =
+			// 	document.querySelector(".track__title").textContent;
+			// const localTrackArtists =
+			// 	document.querySelector(".track__artists").textContent;
+			// const localImgSrc = document.querySelector(
+			// 	".player-controls__track .entity-cover__image.deco-pane"
+			// ).src;
+			// this.sendMessageToPopup({
+			// 	message: "trackChange",
+			// 	playBtnSrc: localPlayBtn,
+			// 	trackName: localTrackName,
+			// 	trackArtists: localTrackArtists,
+			// 	imgSrc: localImgSrc,
+			// });
+
+			// if (mutation.addedNodes[0].classList.contains("d-like_on")) {
+			// 	this.sendMessageToPopup({ message: "likeBtn", likeBtn: "full" });
+			// } else if (document.querySelector(".d-like_on") == null) {
+			// 	this.sendMessageToPopup({ message: "likeBtn", likeBtn: "empty" });
+			// }
+		}
+		if (mutation.target.classList.contains("player-controls__track-controls")) {
+			if (mutation.addedNodes[0] != undefined) {
+				if (mutation.addedNodes[0].classList.contains("d-like_on")) {
+					this.sendMessageToPopup({ message: "likeBtn", likeBtn: "full" });
+				} else if (document.querySelector(".d-like_on") == null) {
+					this.sendMessageToPopup({ message: "likeBtn", likeBtn: "empty" });
+				}
+			}
 		}
 	}
 }
@@ -283,7 +397,6 @@ async function getHistory() {
 		}
 	});
 
-	console.log("observer observe");
 	observer.observe(document.querySelector(".popup-holder"), {
 		childList: true,
 		subtree: true,
